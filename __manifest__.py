@@ -1,10 +1,10 @@
 # -*- encoding: utf-8 -*-
 
 {
-    'name': 'GEFACE Digifact',
+    'name': 'GEFACE efactura',
     'version': '1.0',
     'category': 'Custom',
-    'description': """ Integración con factura electrónica de Digifact """,
+    'description': """ Integración con factura electrónica de efactura """,
     'author': 'Rodrigo Fernandez',
     'website': 'http://solucionesprisma.com/',
     'depends': ['account'],

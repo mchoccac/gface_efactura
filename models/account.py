@@ -109,7 +109,7 @@ class AccountInvoice(models.Model):
 
                     Detalle = etree.SubElement(Detalles, "Detalle")
                     Descripcion = etree.SubElement(Detalle, "Descripcion")
-                    Descripcion.text = cgi.escape(linea.name)
+                    Descripcion.text = cgi.escape(linea.name[0:65])
                     CodigoEAN = etree.SubElement(Detalle, "CodigoEAN")
                     CodigoEAN.text = "11111111111111"
                     UnidadDeMedida = etree.SubElement(Detalle, "UnidadDeMedida")

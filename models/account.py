@@ -1,18 +1,14 @@
 # -*- encoding: utf-8 -*-
 
 from odoo import models, fields, api, _
-from odoo.exceptions import UserError, ValidationError
-
-import odoo.addons.l10n_gt_extra.a_letras
+from odoo.addons import decimal_precision as dp
+from odoo.exceptions import UserError
 
 from datetime import datetime
 from lxml import etree
-from StringIO import StringIO
 import base64
-import cgi
-import zeep
-
 import logging
+import zeep
 
 class AccountInvoice(models.Model):
     _inherit = "account.invoice"
@@ -204,8 +200,9 @@ class AccountInvoice(models.Model):
                 logging.warn(resultado)
 
                 if resultado['Response']['Result']:
-                    dte = etree.parse(StringIO(base64.b64decode(resultado['ResponseData']['ResponseData1'])))
-
+                    xml = bytes(bytearray(base64.b64decode(resultado['ResponseData']['ResponseData1']), encoding='utf-8'))
+                    dte = etree.XML(xml)
+                    
                     pdf = resultado['ResponseData']['ResponseData3']
                     firma = dte.xpath("//*[local-name()='SignatureValue']")[0].text
                     numero = dte.xpath("//uniqueCreatorIdentification")[0].text

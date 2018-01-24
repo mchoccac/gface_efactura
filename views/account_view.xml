@@ -24,7 +24,7 @@
             <field name="inherit_id" ref="account.view_account_journal_form"/>
             <field name="arch" type="xml">
                 <data>
-                    <field name="sequence_id" position="after">
+                    <field name="group_invoice_lines" position="after">
                         <field name="requestor_gface"/>
                         <field name="usuario_gface"/>
                         <field name="nit_gface"/>

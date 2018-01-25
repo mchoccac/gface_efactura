@@ -4,6 +4,8 @@ from odoo import models, fields, api, _
 from odoo.addons import decimal_precision as dp
 from odoo.exceptions import UserError
 
+import odoo.addons.l10n_gt_extra.a_letras
+
 from datetime import datetime
 from lxml import etree
 import base64
@@ -58,6 +60,8 @@ class AccountInvoice(models.Model):
                 TipoDeCambio.text = "1"
                 InformacionDeRegimenIsr = etree.SubElement(Encabezado, "InformacionDeRegimenIsr")
                 InformacionDeRegimenIsr.text = "PAGO_CAJAS"
+                ReferenciaInterna = etree.SubElement(Encabezado, "ReferenciaInterna")
+                ReferenciaInterna.text = str(factura.id)
 
                 Vendedor = etree.SubElement(FactDocGT, "Vendedor")
                 NitV = etree.SubElement(Vendedor, "Nit")
@@ -105,7 +109,7 @@ class AccountInvoice(models.Model):
 
                     Detalle = etree.SubElement(Detalles, "Detalle")
                     Descripcion = etree.SubElement(Detalle, "Descripcion")
-                    Descripcion.text = cgi.escape(linea.name[0:65])
+                    Descripcion.text = linea.name[0:65]
                     CodigoEAN = etree.SubElement(Detalle, "CodigoEAN")
                     CodigoEAN.text = "11111111111111"
                     UnidadDeMedida = etree.SubElement(Detalle, "UnidadDeMedida")
@@ -152,7 +156,7 @@ class AccountInvoice(models.Model):
                     if linea.product_id.default_code:
                         TextosDePosicion = etree.SubElement(Detalle, "TextosDePosicion")
                         Texto = etree.SubElement(TextosDePosicion, "Texto")
-                        Texto.text = cgi.escape(linea.product_id.default_code)
+                        Texto.text = linea.product_id.default_code
 
                     total += total_linea
                     subtotal += total_linea_base
@@ -192,17 +196,16 @@ class AccountInvoice(models.Model):
                     Texto.text = factura.comment
 
                 xmls = etree.tostring(FactDocGT, xml_declaration=True, encoding="UTF-8", pretty_print=True)
-
                 wsdl = 'https://gface.efactura.com.gt/mx.com.fact.wsfront/FactWSFront.asmx?wsdl'
                 client = zeep.Client(wsdl=wsdl)
 
-                resultado = client.service.RequestTransaction(factura.journal_id.requestor_gface, "CONVERT_NATIVE_XML", "GT", factura.journal_id.nit_gface, factura.journal_id.requestor_gface, factura.journal_id.usuario_gface, "<![CDATA["+xmls+"]]>", "XML,PDF", "")
-                logging.warn(resultado)
+                resultado = client.service.RequestTransaction(factura.journal_id.requestor_gface, "CONVERT_NATIVE_XML", "GT", factura.journal_id.nit_gface, factura.journal_id.requestor_gface, factura.journal_id.usuario_gface, xmls, "XML,PDF", "")
+                logging.warn(str(resultado))
 
                 if resultado['Response']['Result']:
-                    xml = bytes(bytearray(base64.b64decode(resultado['ResponseData']['ResponseData1']), encoding='utf-8'))
+                    xml = base64.b64decode(resultado['ResponseData']['ResponseData1'])
                     dte = etree.XML(xml)
-                    
+
                     pdf = resultado['ResponseData']['ResponseData3']
                     firma = dte.xpath("//*[local-name()='SignatureValue']")[0].text
                     numero = dte.xpath("//uniqueCreatorIdentification")[0].text

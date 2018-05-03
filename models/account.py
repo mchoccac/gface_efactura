@@ -109,7 +109,7 @@ class AccountInvoice(models.Model):
 
                     Detalle = etree.SubElement(Detalles, "Detalle")
                     Descripcion = etree.SubElement(Detalle, "Descripcion")
-                    Descripcion.text = linea.name[0:65]
+                    Descripcion.text = linea.name[0:80]
                     CodigoEAN = etree.SubElement(Detalle, "CodigoEAN")
                     CodigoEAN.text = "11111111111111"
                     UnidadDeMedida = etree.SubElement(Detalle, "UnidadDeMedida")
@@ -230,7 +230,7 @@ class AccountJournal(models.Model):
     rango_final_gface = fields.Integer('Rango Final GFACE', copy=False)
     numero_establecimiento_gface = fields.Char('Numero Establecimiento GFACE', copy=False)
     dispositivo_gface = fields.Char('Dispositivo GFACE', copy=False)
-    tipo_documento_gface = fields.Selection([('FACE63', 'FACE63'),('NCE64', 'NCE64')], 'Tipo de Documento GFACE', copy=False)
+    tipo_documento_gface = fields.Selection([('FACE63', 'FACE63'),('FACE66', 'FACE66'),('NCE64', 'NCE64')], 'Tipo de Documento GFACE', copy=False)
 
 
 # http://soporte.solucionesprisma.com:5010/web/content/pos.order/6/pdf_gface

@@ -56,8 +56,17 @@ class AccountInvoice(models.Model):
                 TipoActivo.text = factura.journal_id.tipo_documento_gface
                 CodigoDeMoneda = etree.SubElement(Encabezado, "CodigoDeMoneda")
                 CodigoDeMoneda.text = "GTQ"
+                if factura.currency_id.id != factura.company_id.currency_id.id:
+                    CodigoDeMoneda.text = "USD"
                 TipoDeCambio = etree.SubElement(Encabezado, "TipoDeCambio")
                 TipoDeCambio.text = "1"
+                if factura.currency_id.id != factura.company_id.currency_id.id:
+                    total = 0
+                    for l in factura.move_id.line_ids:
+                        if l.account_id.id == factura.account_id.id:
+                            total += l.debit - l.credit
+                    tipo_cambio = abs(total / f.amount_total)
+                    TipoDeCambio.text = str(tipo_cambio)
                 InformacionDeRegimenIsr = etree.SubElement(Encabezado, "InformacionDeRegimenIsr")
                 InformacionDeRegimenIsr.text = "PAGO_CAJAS"
                 ReferenciaInterna = etree.SubElement(Encabezado, "ReferenciaInterna")

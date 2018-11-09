@@ -162,10 +162,10 @@ class AccountInvoice(models.Model):
                     else:
                         Categoria.text = "SERVICIO"
 
-                    if linea.product_id.default_code:
+                    if linea.name[65:1000]:
                         TextosDePosicion = etree.SubElement(Detalle, "TextosDePosicion")
                         Texto = etree.SubElement(TextosDePosicion, "Texto")
-                        Texto.text = linea.product_id.default_code
+                        Texto.text = linea.name[65:1000]
 
                     total += total_linea
                     subtotal += total_linea_base
@@ -206,6 +206,7 @@ class AccountInvoice(models.Model):
 
                 xmls = etree.tostring(FactDocGT, xml_declaration=True, encoding="UTF-8", pretty_print=True)
                 wsdl = 'https://gface.efactura.com.gt/mx.com.fact.wsfront/FactWSFront.asmx?wsdl'
+                # wsdl = 'https://testgface.efactura.com.gt/mx.com.fact.wsfront/FactWSFront.asmx?wsdl'
                 client = zeep.Client(wsdl=wsdl)
 
                 resultado = client.service.RequestTransaction(factura.journal_id.requestor_gface, "CONVERT_NATIVE_XML", "GT", factura.journal_id.nit_gface, factura.journal_id.requestor_gface, factura.journal_id.usuario_gface, xmls, "XML,PDF", "")

@@ -47,7 +47,7 @@ class AccountInvoice(models.Model):
                 if factura.partner_id.email:
                     Procesamiento = etree.SubElement(FactDocGT, "Procesamiento")
                     Dictionary = etree.SubElement(Procesamiento, "Dictionary", name="email")
-                    EntryFrom = etree.SubElement(Dictionary, "Entry", v="ACCOUNT_OWNER", k="from")
+                    EntryFrom = etree.SubElement(Dictionary, "Entry", v=factura.company_id.email, k="from")
                     EntryTo = etree.SubElement(Dictionary, "Entry", v=factura.partner_id.email, k="to")
                     EntryFormat = etree.SubElement(Dictionary, "Entry", v="pdf", k="formats")
 
@@ -115,6 +115,7 @@ class AccountInvoice(models.Model):
                     total_linea_base = precio_unitario_base * linea.quantity
 
                     total_impuestos = total_linea - total_linea_base
+                    tasa = "12" if total_impuestos > 0 else "0"
 
                     Detalle = etree.SubElement(Detalles, "Detalle")
                     Descripcion = etree.SubElement(Detalle, "Descripcion")
@@ -152,7 +153,7 @@ class AccountInvoice(models.Model):
                     BaseDetalle = etree.SubElement(ImpuestoDetalle, "Base")
                     BaseDetalle.text = str(total_linea_base)
                     TasaDetalle = etree.SubElement(ImpuestoDetalle, "Tasa")
-                    TasaDetalle.text = "12"
+                    TasaDetalle.text = tasa
                     MontoDetalle = etree.SubElement(ImpuestoDetalle, "Monto")
                     MontoDetalle.text = str(total_impuestos)
 
@@ -190,7 +191,7 @@ class AccountInvoice(models.Model):
                 Base = etree.SubElement(Impuesto, "Base")
                 Base.text = str(subtotal)
                 Tasa = etree.SubElement(Impuesto, "Tasa")
-                Tasa.text = "12"
+                Tasa.text = tasa
                 Monto = etree.SubElement(Impuesto, "Monto")
                 Monto.text = str(total - subtotal)
 
@@ -223,7 +224,7 @@ class AccountInvoice(models.Model):
                     factura.firma_gface = firma
                     factura.name = numero
                 else:
-                    raise UserError(resultado['Response']['Description'])
+                    raise UserError(xmls)
 
         return super(AccountInvoice,self).invoice_validate()
 

@@ -143,7 +143,7 @@ class AccountInvoice(models.Model):
                     TotalDeImpuestosDetalle = etree.SubElement(ImpuestosDetalle, "TotalDeImpuestos")
                     TotalDeImpuestosDetalle.text = str(total_impuestos)
                     IngresosNetosGravadosDetalle = etree.SubElement(ImpuestosDetalle, "IngresosNetosGravados")
-                    IngresosNetosGravadosDetalle.text = str(total_linea_base)
+                    IngresosNetosGravadosDetalle.text = str(total_linea_base) if total_impuestos > 0 else "0"
                     TotalDeIVADetalle = etree.SubElement(ImpuestosDetalle, "TotalDeIVA")
                     TotalDeIVADetalle.text = str(total_impuestos)
 
@@ -181,7 +181,7 @@ class AccountInvoice(models.Model):
                 TotalDeImpuestos = etree.SubElement(Impuestos, "TotalDeImpuestos")
                 TotalDeImpuestos.text = str(total - subtotal)
                 IngresosNetosGravados = etree.SubElement(Impuestos, "IngresosNetosGravados")
-                IngresosNetosGravados.text = str(subtotal)
+                IngresosNetosGravados.text = str(subtotal) if total - subtotal > 0 else "0"
                 TotalDeIVA = etree.SubElement(Impuestos, "TotalDeIVA")
                 TotalDeIVA.text = str(total - subtotal)
 
@@ -224,7 +224,7 @@ class AccountInvoice(models.Model):
                     factura.firma_gface = firma
                     factura.name = numero
                 else:
-                    raise UserError(xmls)
+                    raise UserError(resultado['Response']['Description'])
 
         return super(AccountInvoice,self).invoice_validate()
 

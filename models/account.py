@@ -115,7 +115,6 @@ class AccountInvoice(models.Model):
                     total_linea_base = precio_unitario_base * linea.quantity
 
                     total_impuestos = total_linea - total_linea_base
-                    tasa = "12" if total_impuestos > 0 else "0"
 
                     Detalle = etree.SubElement(Detalles, "Detalle")
                     Descripcion = etree.SubElement(Detalle, "Descripcion")
@@ -153,7 +152,7 @@ class AccountInvoice(models.Model):
                     BaseDetalle = etree.SubElement(ImpuestoDetalle, "Base")
                     BaseDetalle.text = str(total_linea_base)
                     TasaDetalle = etree.SubElement(ImpuestoDetalle, "Tasa")
-                    TasaDetalle.text = tasa
+                    TasaDetalle.text = "12" if total_impuestos > 0 or precio_unitario == 0 else "0"
                     MontoDetalle = etree.SubElement(ImpuestoDetalle, "Monto")
                     MontoDetalle.text = str(total_impuestos)
 
@@ -191,7 +190,7 @@ class AccountInvoice(models.Model):
                 Base = etree.SubElement(Impuesto, "Base")
                 Base.text = str(subtotal)
                 Tasa = etree.SubElement(Impuesto, "Tasa")
-                Tasa.text = tasa
+                Tasa.text = "12" if total - subtotal > 0 else "0"
                 Monto = etree.SubElement(Impuesto, "Monto")
                 Monto.text = str(total - subtotal)
 
@@ -206,6 +205,7 @@ class AccountInvoice(models.Model):
                     Texto.text = factura.comment
 
                 xmls = etree.tostring(FactDocGT, xml_declaration=True, encoding="UTF-8", pretty_print=True)
+                logging.warn(xmls)
                 wsdl = 'https://gface.efactura.com.gt/mx.com.fact.wsfront/FactWSFront.asmx?wsdl'
                 # wsdl = 'https://testgface.efactura.com.gt/mx.com.fact.wsfront/FactWSFront.asmx?wsdl'
                 client = zeep.Client(wsdl=wsdl)
